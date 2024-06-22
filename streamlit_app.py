@@ -50,41 +50,24 @@ df = load_data()
 # Debugging: Inspect the DataFrame structure
 st.write("DataFrame structure:", df.head())
 
-# Count keywords
-keyword_counts = count_keywords(df, keywords)
+# Filter by schoolcategory
+school_categories = df['schoolcategory'].unique()
+selected_category = st.selectbox("Select School Category", school_categories)
+
+filtered_df = df[df['schoolcategory'] == selected_category]
+
+# Count keywords in the filtered data
+keyword_counts = count_keywords(filtered_df, keywords)
 
 # Create a DataFrame for keyword counts
 keyword_summary = pd.DataFrame(list(keyword_counts.items()), columns=['Keyword', 'Count'])
 
-# Reshape the data for visualization
-# Assuming that you have school category counts separately as in your original code
-# Dummy data for demonstration
-gy_counts = [10, 15, 20]
-gs_counts = [12, 18, 25]
-ms_counts = [8, 14, 22]
-rs_counts = [11, 19, 23]
-
-# Example keywords list for matching counts (should be matched with actual keywords)
-example_keywords = ["Keyword1", "Keyword2", "Keyword3"]
-
-keyword_summary = pd.DataFrame({
-    'Keyword': example_keywords,
-    'Gymnasium': gy_counts,
-    'Grundschule': gs_counts,
-    'Mittelschule': ms_counts,
-    'Realschule': rs_counts
-})
-
-# Reshape the data for visualization
-keyword_summary_long = keyword_summary.melt(id_vars='Keyword', var_name='schoolcategory', value_name='Count')
-
-# Plot the keyword counts for each school type
+# Plot the keyword counts
 plt.figure(figsize=(10, 8))
-sns.barplot(data=keyword_summary_long, x='Count', y='Keyword', hue='schoolcategory', dodge=True)
-plt.title('Keyword Counts by School Type')
+sns.barplot(data=keyword_summary, x='Count', y='Keyword', dodge=True)
+plt.title(f'Keyword Counts for {selected_category}')
 plt.xlabel('Count')
 plt.ylabel('Keyword')
-plt.legend(title='School Category')
 plt.xticks(size=8)
 plt.yticks(size=8)
 
