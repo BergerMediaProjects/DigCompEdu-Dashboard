@@ -9,6 +9,8 @@ import os
 from datetime import datetime
 import json
 
+st.write("### DigCompEdu Bavaria Label Dashboard")
+
 DATABASE_PATH = 'lehrgaenge_data.db'
 
 # Function to initialize the database
