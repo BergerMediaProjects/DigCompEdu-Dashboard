@@ -47,16 +47,9 @@ keywords = [
 # Load data
 df = load_data()
 
-# Debugging: Inspect the DataFrame structure and unique values of 'schoolcategory'
-st.write("DataFrame structure:", df.head())
-st.write("Unique school categories:", df['schoolcategory'].explode().unique())
-
 # Filter by schoolcategory
 school_categories = df['schoolcategory'].explode().unique()
 selected_category = st.selectbox("Select School Category", school_categories)
-
-# Debugging: Inspect selected_category
-st.write("Selected category:", selected_category)
 
 # Filter the DataFrame based on the selected schoolcategory
 filtered_df = df[df['schoolcategory'].apply(lambda x: selected_category in x if isinstance(x, list) else x == selected_category)]
@@ -69,7 +62,7 @@ keyword_summary = pd.DataFrame(list(keyword_counts.items()), columns=['Keyword',
 
 # Plot the keyword counts
 plt.figure(figsize=(10, 8))
-sns.barplot(data=keyword_summary, x='Count', y='Keyword', dodge=True)
+sns.barplot(data=keyword_summary, x='Count', y='Keyword')
 plt.title(f'Keyword Counts for {selected_category}')
 plt.xlabel('Count')
 plt.ylabel('Keyword')
