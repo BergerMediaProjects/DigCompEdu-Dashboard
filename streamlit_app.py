@@ -7,6 +7,7 @@ import seaborn as sns
 import re
 import os
 from datetime import datetime
+import json
 
 DATABASE_PATH = 'lehrgaenge_data.db'
 
@@ -35,10 +36,13 @@ def fetch_and_store_data():
         lehrgaenge = content['response']['docs']
         lehrgaenge_df = pd.DataFrame(lehrgaenge)
         
+        # Log the columns for debugging
+        st.write("Fetched data columns:", lehrgaenge_df.columns.tolist())
+        
         conn = sqlite3.connect(DATABASE_PATH)
         for _, row in lehrgaenge_df.iterrows():
             try:
-                conn.execute('INSERT INTO lehrgaenge (token, data) VALUES (?, ?)', (row['token'], row.to_json()))
+                conn.execute('INSERT INTO lehrgaenge (token, data) VALUES (?, ?)', (row['token'], json.dumps(row.to_dict())))
             except sqlite3.IntegrityError:
                 # Ignore duplicate tokens
                 pass
@@ -55,6 +59,12 @@ def load_data():
     df = pd.read_sql(query, conn)
     conn.close()
     df['fetch_date'] = pd.to_datetime(df['fetch_date'])
+    
+    # Convert the JSON strings in the 'data' column back to DataFrame
+    df_data = pd.json_normalize(df['data'].apply(json.loads))
+    df_data.columns = [f"json_{col}" for col in df_data.columns]  # Rename columns to avoid duplicates
+    df = df.drop(columns=['data'])  # Drop the original 'data' column before merging
+    df = pd.concat([df, df_data], axis=1)
     return df
 
 # Function to count keywords
@@ -117,17 +127,29 @@ keywords_colors = {
 # Load data
 df = load_data()
 
-# Extract the first three characters from the token column to identify time periods
-df['time_period'] = df['token'].str[:3]
+# Debugging: print the first few rows to check the structure
+st.write(df.head())
+
+# Ensure 'token' is a string
+if 'json_token' in df.columns:
+    df['json_token'] = df['json_token'].astype(str)
+    df['time_period'] = df['json_token'].str[:3]
+else:
+    st.error("Token column is missing from the data")
+
 time_periods = df['time_period'].unique().tolist()
 time_periods.append("All Time Periods")
 
 # Categorize any non-matching entries as "other"
 df['time_period'] = df['time_period'].apply(lambda x: x if x in time_periods else "other")
 
-# Filter by schoolcategory
-school_categories = df['schoolcategory'].explode().unique()
-school_categories = ["alle Schularten"] + list(school_categories)
+# Check if 'json_schoolcategory' column exists
+if 'json_schoolcategory' in df.columns:
+    school_categories = df['json_schoolcategory'].explode().unique()
+    school_categories = ["alle Schularten"] + list(school_categories)
+else:
+    school_categories = ["alle Schularten"]
+
 selected_category = st.selectbox("Select School Category", school_categories)
 
 # Filter by time periods
@@ -139,8 +161,8 @@ if selected_time_period != "All Time Periods":
 else:
     filtered_df = df
 
-if selected_category != "alle Schularten":
-    filtered_df = filtered_df[filtered_df['schoolcategory'].apply(lambda x: selected_category in x if isinstance(x, list) else x == selected_category)]
+if selected_category != "alle Schularten" and 'json_schoolcategory' in df.columns:
+    filtered_df = filtered_df[filtered_df['json_schoolcategory'].apply(lambda x: selected_category in x if isinstance(x, list) else x == selected_category)]
 
 # Count keywords in the filtered data
 keyword_counts = count_keywords(filtered_df, keywords)
