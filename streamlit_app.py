@@ -51,15 +51,18 @@ df = load_data()
 st.write("DataFrame structure:", df.head())
 st.write("Unique school categories:", df['schoolcategory'].explode().unique())
 
+# Explode 'schoolcategory' to ensure each category is in a separate row
+df_exploded = df.explode('schoolcategory')
+
 # Filter by schoolcategory
-school_categories = df['schoolcategory'].explode().unique()
+school_categories = df_exploded['schoolcategory'].unique()
 selected_category = st.selectbox("Select School Category", school_categories)
 
 # Debugging: Inspect selected_category
 st.write("Selected category:", selected_category)
 
 # Filter the DataFrame based on the selected schoolcategory
-filtered_df = df[df['schoolcategory'].apply(lambda x: selected_category in x if isinstance(x, list) else x == selected_category)]
+filtered_df = df_exploded[df_exploded['schoolcategory'] == selected_category]
 
 # Count keywords in the filtered data
 keyword_counts = count_keywords(filtered_df, keywords)
