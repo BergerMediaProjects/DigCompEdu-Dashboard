@@ -28,18 +28,26 @@ def count_keywords(data, keywords):
     keyword_columns = [col for col in data.columns if 'keywords' in col.lower()]
     keyword_counts = {keyword: 0 for keyword in keywords}
     
+    # Debugging: Print the keyword columns and some of their content
+    st.write("Keyword columns found:", keyword_columns)
+    for col in keyword_columns:
+        st.write(f"Sample data in column '{col}':", data[col].head())
+    
     for keyword in keywords:
         regex_pattern = re.compile(r'\b' + re.escape(keyword) + r'\b', re.IGNORECASE)
         for column in keyword_columns:
-            keyword_counts[keyword] += data[column].fillna("").apply(lambda x: bool(regex_pattern.search(str(x)))).sum()
+            count = data[column].fillna("").apply(lambda x: bool(regex_pattern.search(str(x)))).sum()
+            keyword_counts[keyword] += count
+            # Debugging: Print keyword count
+            st.write(f"Count for '{keyword}' in column '{column}': {count}")
     
     return keyword_counts
 
 # Define the list of keywords and their associated colors
 keywords_colors = {
     "Berufliche Kommunikation": "#c74300",
-    "Berufliche Zusammenarbeit": "#c74300",
-    "Reflektierte Praxis": "#c74300",
+    "Kollegiale Zusammenarbeit": "#c74300",
+    "Reflektiertes Handeln": "#c74300",
     "Digitale Weiterbildung": "#c74300",
     "Auswählen digitaler Ressourcen": "#00962c",
     "Erstellen und Anpassen digitaler Ressourcen": "#00962c",
@@ -78,6 +86,9 @@ else:
 # Count keywords in the filtered data
 keywords = list(keywords_colors.keys())
 keyword_counts = count_keywords(filtered_df, keywords)
+
+# Debugging: Check keyword counts
+st.write("Keyword counts:", keyword_counts)
 
 # Create a DataFrame for keyword counts
 keyword_summary = pd.DataFrame(list(keyword_counts.items()), columns=['Keyword', 'Count'])
