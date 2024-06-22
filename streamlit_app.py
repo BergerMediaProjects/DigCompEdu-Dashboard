@@ -35,16 +35,31 @@ def count_keywords(data, keywords):
     
     return keyword_counts
 
-# Define the list of keywords
-keywords = [
-    "Berufliche Kommunikation", "Kollegiale Zusammenarbeit", "Reflektiertes Handeln", "Kontinuierliche Weiterentwicklung",
-    "Auswählen digitaler Ressourcen", "Erstellen und Anpassen digitaler Ressourcen", "Organisieren, Schützen und Teilen digitaler Ressourcen",
-    "Lehren", "Lernbegleitung", "Kollaboratives Lernen", "Selbstgesteuertes Lernen",
-    "Lernstandserhebung", "Analyse der Lernevidenz", "Feedback und Planung",
-    "Barrierefreiheit und digitale Teilhabe", "Differenzierung", "Schüleraktivierung",
-    "Basiskompetenzen", "Suchen und Verarbeiten", "Kommunizieren und Kooperieren",
-    "Produzieren und Präsentieren", "Analysieren und Reflektieren"
-]
+# Define the list of keywords and their associated colors from the DigCompEdu Bavaria document
+keywords_colors = {
+    "Berufliche Kommunikation": "#1f77b4",  # Example color
+    "Kollegiale Zusammenarbeit": "#ff7f0e",
+    "Reflektiertes Handeln": "#2ca02c",
+    "Kontinuierliche Weiterentwicklung": "#d62728",
+    "Auswählen digitaler Ressourcen": "#9467bd",
+    "Erstellen und Anpassen digitaler Ressourcen": "#8c564b",
+    "Organisieren, Schützen und Teilen digitaler Ressourcen": "#e377c2",
+    "Lehren": "#7f7f7f",
+    "Lernbegleitung": "#bcbd22",
+    "Kollaboratives Lernen": "#17becf",
+    "Selbstgesteuertes Lernen": "#1f77b4",
+    "Lernstandserhebung": "#ff7f0e",
+    "Analyse der Lernevidenz": "#2ca02c",
+    "Feedback und Planung": "#d62728",
+    "Barrierefreiheit und digitale Teilhabe": "#9467bd",
+    "Differenzierung": "#8c564b",
+    "Schüleraktivierung": "#e377c2",
+    "Basiskompetenzen": "#7f7f7f",
+    "Suchen und Verarbeiten": "#bcbd22",
+    "Kommunizieren und Kooperieren": "#17becf",
+    "Produzieren und Präsentieren": "#1f77b4",
+    "Analysieren und Reflektieren": "#ff7f0e"
+}
 
 # Load data
 df = load_data()
@@ -61,19 +76,20 @@ else:
     filtered_df = df
 
 # Count keywords in the filtered data
+keywords = list(keywords_colors.keys())
 keyword_counts = count_keywords(filtered_df, keywords)
 
 # Create a DataFrame for keyword counts
 keyword_summary = pd.DataFrame(list(keyword_counts.items()), columns=['Keyword', 'Count'])
 
-# Plot the keyword counts
-plt.figure(figsize=(12, 10))
-ax = sns.barplot(data=keyword_summary, x='Count', y='Keyword')
+# Plot the keyword counts with custom colors
+plt.figure(figsize=(10, 8))
+ax = sns.barplot(data=keyword_summary, x='Count', y='Keyword', palette=keywords_colors.values())
 plt.title(f'Keyword Counts for {selected_category}')
 plt.xlabel('Count')
 plt.ylabel('Keyword')
-plt.xticks(size=10)
-plt.yticks(size=10)
+plt.xticks(size=8)
+plt.yticks(size=8)
 
 # Display plot in Streamlit app
 st.pyplot(plt)
