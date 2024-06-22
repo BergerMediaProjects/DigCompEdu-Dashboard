@@ -36,9 +36,6 @@ def fetch_and_store_data():
         lehrgaenge = content['response']['docs']
         lehrgaenge_df = pd.DataFrame(lehrgaenge)
         
-        # Log the columns for debugging
-        st.write("Fetched data columns:", lehrgaenge_df.columns.tolist())
-        
         conn = sqlite3.connect(DATABASE_PATH)
         for _, row in lehrgaenge_df.iterrows():
             try:
@@ -127,21 +124,53 @@ keywords_colors = {
 # Load data
 df = load_data()
 
-# Debugging: print the first few rows to check the structure
-st.write(df.head())
-
-# Ensure 'token' is a string
+# Ensure 'token' is a string and categorize time periods
 if 'json_token' in df.columns:
     df['json_token'] = df['json_token'].astype(str)
-    df['time_period'] = df['json_token'].str[:3]
+    
+    # Match tokens with the format NNN/
+    df['time_period'] = df['json_token'].apply(lambda x: x[:4] if re.match(r'\d{3}/', x[:4]) else 'other')
 else:
     st.error("Token column is missing from the data")
 
-time_periods = df['time_period'].unique().tolist()
-time_periods.append("All Time Periods")
+# Mapping for the time periods
+time_period_mapping = {
+    "105/": "Feb '23 - Aug '23",
+    "106/": "Sep '23 - Jan '24",
+    "107/": "Feb '24 - Aug '24",
+    "108/": "Sep '24 - Jan '25",
+    "109/": "Feb '25 - Aug '25",
+    "110/": "Sep '25 - Jan '26",
+    "111/": "Feb '26 - Aug '26",
+    "112/": "Sep '26 - Jan '27",
+    "113/": "Feb '27 - Aug '27",
+    "114/": "Sep '27 - Jan '28",
+    "115/": "Feb '28 - Aug '28",
+    "116/": "Sep '28 - Jan '29",
+    "117/": "Feb '29 - Aug '29",
+    "118/": "Sep '29 - Jan '30",
+    "119/": "Feb '30 - Aug '30",
+    "120/": "Sep '30 - Jan '31",
+}
 
-# Categorize any non-matching entries as "other"
-df['time_period'] = df['time_period'].apply(lambda x: x if x in time_periods else "other")
+# Get unique time periods and append "Alle Zeiträume"
+time_periods = df['time_period'].unique().tolist()
+time_periods = [tp for tp in time_periods if tp in time_period_mapping]  # Filter only valid time periods
+time_periods.append("Alle Zeiträume")
+
+# Create a display mapping for dropdown
+time_period_display = {tp: time_period_mapping.get(tp, tp) for tp in time_periods}
+time_period_display["Alle Zeiträume"] = "Alle Zeiträume"
+
+# Dropdown for time periods
+selected_time_period_display = st.selectbox("Zeitraum wählen", list(time_period_display.values()))
+selected_time_period = [k for k, v in time_period_display.items() if v == selected_time_period_display][0]
+
+# Filter the DataFrame based on the selected schoolcategory and time periods
+if selected_time_period != "Alle Zeiträume":
+    filtered_df = df[df['time_period'] == selected_time_period]
+else:
+    filtered_df = df
 
 # Check if 'json_schoolcategory' column exists
 if 'json_schoolcategory' in df.columns:
@@ -150,16 +179,7 @@ if 'json_schoolcategory' in df.columns:
 else:
     school_categories = ["alle Schularten"]
 
-selected_category = st.selectbox("Select School Category", school_categories)
-
-# Filter by time periods
-selected_time_period = st.selectbox("Select Time Period", time_periods)
-
-# Filter the DataFrame based on the selected schoolcategory and time periods
-if selected_time_period != "All Time Periods":
-    filtered_df = df[df['time_period'] == selected_time_period]
-else:
-    filtered_df = df
+selected_category = st.selectbox("Schulart wählen", school_categories)
 
 if selected_category != "alle Schularten" and 'json_schoolcategory' in df.columns:
     filtered_df = filtered_df[filtered_df['json_schoolcategory'].apply(lambda x: selected_category in x if isinstance(x, list) else x == selected_category)]
@@ -173,7 +193,7 @@ keyword_summary = pd.DataFrame(list(keyword_counts.items()), columns=['Keyword',
 # Plot the keyword counts with custom colors
 plt.figure(figsize=(10, 8))
 ax = sns.barplot(data=keyword_summary, x='Count', y='Keyword', palette=[keywords_colors[keyword] for keyword in keyword_summary['Keyword']])
-plt.title(f'Keyword Counts for {selected_category} ({selected_time_period})')
+plt.title(f'Keyword Counts for {selected_category} ({selected_time_period_display})')
 plt.xlabel('Count')
 plt.ylabel('Keyword')
 plt.xticks(size=8)
@@ -183,5 +203,5 @@ plt.yticks(size=8)
 st.pyplot(plt)
 
 # Display the table with keyword counts below the plot
-st.write("### Keyword Counts Table")
+st.write("### DigCompEdu Bavaria Label - Häufigkeiten")
 st.table(keyword_summary)
