@@ -47,18 +47,33 @@ keywords = [
 # Load data
 df = load_data()
 
+# Debugging: Check if data is loaded correctly
+st.write("Data loaded:", df.head())
+
 # Filter by schoolcategory
 school_categories = df['schoolcategory'].explode().unique()
 selected_category = st.selectbox("Select School Category", school_categories)
 
+# Debugging: Inspect selected_category
+st.write("Selected category:", selected_category)
+
 # Filter the DataFrame based on the selected schoolcategory
 filtered_df = df[df['schoolcategory'].apply(lambda x: selected_category in x if isinstance(x, list) else x == selected_category)]
+
+# Debugging: Check if data is filtered correctly
+st.write("Filtered data:", filtered_df.head())
 
 # Count keywords in the filtered data
 keyword_counts = count_keywords(filtered_df, keywords)
 
+# Debugging: Check keyword counts
+st.write("Keyword counts:", keyword_counts)
+
 # Create a DataFrame for keyword counts
 keyword_summary = pd.DataFrame(list(keyword_counts.items()), columns=['Keyword', 'Count'])
+
+# Debugging: Check keyword summary DataFrame
+st.write("Keyword summary:", keyword_summary)
 
 # Plot the keyword counts
 plt.figure(figsize=(10, 8))
