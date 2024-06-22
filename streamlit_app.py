@@ -35,30 +35,30 @@ def count_keywords(data, keywords):
     
     return keyword_counts
 
-# Define the list of keywords and their associated colors from the DigCompEdu Bavaria document
+# Define the list of keywords and their associated colors
 keywords_colors = {
-    "Berufliche Kommunikation": "#1f77b4",  # Example color
-    "Kollegiale Zusammenarbeit": "#ff7f0e",
-    "Reflektiertes Handeln": "#2ca02c",
-    "Kontinuierliche Weiterentwicklung": "#d62728",
-    "Auswählen digitaler Ressourcen": "#9467bd",
-    "Erstellen und Anpassen digitaler Ressourcen": "#8c564b",
-    "Organisieren, Schützen und Teilen digitaler Ressourcen": "#e377c2",
-    "Lehren": "#7f7f7f",
-    "Lernbegleitung": "#bcbd22",
-    "Kollaboratives Lernen": "#17becf",
-    "Selbstgesteuertes Lernen": "#1f77b4",
-    "Lernstandserhebung": "#ff7f0e",
-    "Analyse der Lernevidenz": "#2ca02c",
-    "Feedback und Planung": "#d62728",
-    "Barrierefreiheit und digitale Teilhabe": "#9467bd",
-    "Differenzierung": "#8c564b",
-    "Schüleraktivierung": "#e377c2",
-    "Basiskompetenzen": "#7f7f7f",
-    "Suchen und Verarbeiten": "#bcbd22",
-    "Kommunizieren und Kooperieren": "#17becf",
-    "Produzieren und Präsentieren": "#1f77b4",
-    "Analysieren und Reflektieren": "#ff7f0e"
+    "1.1 Berufliche Kommunikation": "#c74300",
+    "1.2 Berufliche Zusammenarbeit": "#c74300",
+    "1.3 Reflektierte Praxis": "#c74300",
+    "1.4 Digitale Weiterbildung": "#c74300",
+    "2.1 Auswählen digitaler Ressourcen": "#00962c",
+    "2.2 Erstellen und Anpassen digitaler Ressourcen": "#00962c",
+    "2.3 Organisieren, Schützen und Teilen digitaler Ressourcen": "#00962c",
+    "3.1 Lehren": "#245eb8",
+    "3.2 Lernbegleitung": "#245eb8",
+    "3.3 Kollaboratives Lernen": "#245eb8",
+    "3.4 Selbstgesteuertes Lernen": "#245eb8",
+    "4.1 Lernstand erheben": "#006a66",
+    "4.2 Lern-Evidenzen analysieren": "#006a66",
+    "4.3 Feedback und Planung": "#006a66",
+    "5.1 Digitale Teilhabe": "#75006b",
+    "5.2 Differenzierung und Individualisierung": "#75006b",
+    "5.3 Aktive Einbindung der Lernenden": "#75006b",
+    "6.1 Informations- und Medienkompetenz": "#8f0000",
+    "6.2 Digitale Kommunikation und Zusammenarbeit": "#8f0000",
+    "6.3 Erstellung digitaler Inhalte": "#8f0000",
+    "6.4 Verantwortungsvoller Umgang mit digitalen Medien": "#8f0000",
+    "6.5 Digitales Problemlösen": "#8f0000"
 }
 
 # Load data
@@ -84,7 +84,7 @@ keyword_summary = pd.DataFrame(list(keyword_counts.items()), columns=['Keyword',
 
 # Plot the keyword counts with custom colors
 plt.figure(figsize=(10, 8))
-ax = sns.barplot(data=keyword_summary, x='Count', y='Keyword', palette=keywords_colors.values())
+ax = sns.barplot(data=keyword_summary, x='Count', y='Keyword', palette=[keywords_colors[keyword] for keyword in keyword_summary['Keyword']])
 plt.title(f'Keyword Counts for {selected_category}')
 plt.xlabel('Count')
 plt.ylabel('Keyword')
