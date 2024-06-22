@@ -33,8 +33,9 @@ def count_keywords(data, keywords):
         st.write(f"Sample data in column '{col}':", data[col].head())
 
     for keyword in keywords:
+        regex_pattern = f'\\b{keyword}\\b'
         for column in keyword_columns:
-            keyword_counts[keyword] += data[column].fillna("").str.contains(keyword, case=False, na=False).sum()
+            keyword_counts[keyword] += data[column].fillna("").str.contains(regex_pattern, case=False, na=False).sum()
     
     return keyword_counts
 
