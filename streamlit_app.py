@@ -27,6 +27,11 @@ def count_keywords(data, keywords):
     keyword_columns = [col for col in data.columns if 'keywords' in col.lower()]
     keyword_counts = {keyword: 0 for keyword in keywords}
     
+    # Debugging: Print the keyword columns and some of their content
+    st.write("Keyword columns found:", keyword_columns)
+    for col in keyword_columns:
+        st.write(f"Sample data in column '{col}':", data[col].head())
+
     for keyword in keywords:
         for column in keyword_columns:
             keyword_counts[keyword] += data[column].fillna("").str.contains(keyword, case=False, na=False).sum()
