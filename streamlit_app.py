@@ -51,10 +51,14 @@ df = load_data()
 
 # Filter by schoolcategory
 school_categories = df['schoolcategory'].explode().unique()
+school_categories = ["alle Schularten"] + list(school_categories)
 selected_category = st.selectbox("Select School Category", school_categories)
 
 # Filter the DataFrame based on the selected schoolcategory
-filtered_df = df[df['schoolcategory'].apply(lambda x: selected_category in x if isinstance(x, list) else x == selected_category)]
+if selected_category != "alle Schularten":
+    filtered_df = df[df['schoolcategory'].apply(lambda x: selected_category in x if isinstance(x, list) else x == selected_category)]
+else:
+    filtered_df = df
 
 # Count keywords in the filtered data
 keyword_counts = count_keywords(filtered_df, keywords)
