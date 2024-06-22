@@ -13,9 +13,22 @@ st.write("""
 Verwenden Sie die Dropdown-Menüs unten, um die angezeigten Daten nach Schulart und Zeitraum zu filtern.
 
 **Zeitraum auswählen:**
-- **Feb. 2023 - Aug. 2023**: Daten von Februar 2023 bis August 2023
-- **Sep. 2023 - Jan. 2024**: Daten von September 2023 bis Januar 2024
-- **Feb. 2024 - Aug. 2024**: Daten von Februar 2024 bis August 2024
+- **Feb. 2023 - Aug. 2023 (105)**
+- **Sep. 2023 - Jan. 2024 (106)**
+- **Feb. 2024 - Aug. 2024 (107)**
+- **Sep. 2024 - Jan. 2025 (108)**
+- **Feb. 2025 - Aug. 2025 (109)**
+- **Sep. 2025 - Jan. 2026 (110)**
+- **Feb. 2026 - Aug. 2026 (111)**
+- **Sep. 2026 - Jan. 2027 (112)**
+- **Feb. 2027 - Aug. 2027 (113)**
+- **Sep. 2027 - Jan. 2028 (114)**
+- **Feb. 2028 - Aug. 2028 (115)**
+- **Sep. 2028 - Jan. 2029 (116)**
+- **Feb. 2029 - Aug. 2029 (117)**
+- **Sep. 2029 - Jan. 2030 (118)**
+- **Feb. 2030 - Aug. 2030 (119)**
+- **Sep. 2030 - Jan. 2031 (120)**
 - **other**: Daten, die keinem der oben genannten Zeiträume entsprechen
 - **Alle Zeiträume**: Alle verfügbaren Daten anzeigen
 
@@ -97,11 +110,29 @@ df = load_data()
 
 # Extract the first three characters from the token column to identify time periods
 df['time_period'] = df['token'].str[:3]
-time_periods = df['time_period'].unique().tolist()
-time_periods.append("All Time Periods")
 
-# Categorize any non-matching entries as "other"
-df['time_period'] = df['time_period'].apply(lambda x: x if x in time_periods else "other")
+# Define the mapping of token values to time periods
+time_period_mapping = {
+    "105": "Feb. 2023 - Aug. 2023",
+    "106": "Sep. 2023 - Jan. 2024",
+    "107": "Feb. 2024 - Aug. 2024",
+    "108": "Sep. 2024 - Jan. 2025",
+    "109": "Feb. 2025 - Aug. 2025",
+    "110": "Sep. 2025 - Jan. 2026",
+    "111": "Feb. 2026 - Aug. 2026",
+    "112": "Sep. 2026 - Jan. 2027",
+    "113": "Feb. 2027 - Aug. 2027",
+    "114": "Sep. 2027 - Jan. 2028",
+    "115": "Feb. 2028 - Aug. 2028",
+    "116": "Sep. 2028 - Jan. 2029",
+    "117": "Feb. 2029 - Aug. 2029",
+    "118": "Sep. 2029 - Jan. 2030",
+    "119": "Feb. 2030 - Aug. 2030",
+    "120": "Sep. 2030 - Jan. 2031"
+}
+
+# Map the token values to human-readable time periods
+df['time_period'] = df['time_period'].map(time_period_mapping).fillna("other")
 
 # Filter by schoolcategory
 school_categories = df['schoolcategory'].explode().unique()
@@ -109,6 +140,7 @@ school_categories = ["alle Schularten"] + list(school_categories)
 selected_category = st.selectbox("Select School Category", school_categories)
 
 # Filter by time periods
+time_periods = list(time_period_mapping.values()) + ["other", "All Time Periods"]
 selected_time_period = st.selectbox("Select Time Period", time_periods)
 
 # Filter the DataFrame based on the selected schoolcategory and time periods
