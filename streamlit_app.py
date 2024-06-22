@@ -75,9 +75,9 @@ plt.ylabel('Keyword')
 plt.xticks(size=8)
 plt.yticks(size=8)
 
-# Add annotations to the bars
-for index, value in enumerate(keyword_summary['Count']):
-    ax.text(value, index, str(value), color='black', ha="left", va="center")
-
 # Display plot in Streamlit app
 st.pyplot(plt)
+
+# Display the table with keyword counts below the plot
+st.write("### Keyword Counts Table")
+st.table(keyword_summary)
