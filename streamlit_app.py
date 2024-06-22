@@ -76,16 +76,30 @@ keywords_colors = {
 # Load data
 df = load_data()
 
+# Extract the first three characters from the token column to identify time periods
+df['time_period'] = df['token'].str[:3]
+time_periods = df['time_period'].unique().tolist()
+time_periods.append("All Time Periods")
+
+# Categorize any non-matching entries as "other"
+df['time_period'] = df['time_period'].apply(lambda x: x if x in time_periods else "other")
+
 # Filter by schoolcategory
 school_categories = df['schoolcategory'].explode().unique()
 school_categories = ["alle Schularten"] + list(school_categories)
 selected_category = st.selectbox("Select School Category", school_categories)
 
-# Filter the DataFrame based on the selected schoolcategory
-if selected_category != "alle Schularten":
-    filtered_df = df[df['schoolcategory'].apply(lambda x: selected_category in x if isinstance(x, list) else x == selected_category)]
+# Filter by time periods
+selected_time_period = st.selectbox("Select Time Period", time_periods)
+
+# Filter the DataFrame based on the selected schoolcategory and time periods
+if selected_time_period != "All Time Periods":
+    filtered_df = df[df['time_period'] == selected_time_period]
 else:
     filtered_df = df
+
+if selected_category != "alle Schularten":
+    filtered_df = filtered_df[filtered_df['schoolcategory'].apply(lambda x: selected_category in x if isinstance(x, list) else x == selected_category)]
 
 # Count keywords in the filtered data
 keyword_counts = count_keywords(filtered_df, keywords)
@@ -96,7 +110,7 @@ keyword_summary = pd.DataFrame(list(keyword_counts.items()), columns=['Keyword',
 # Plot the keyword counts with custom colors
 plt.figure(figsize=(10, 8))
 ax = sns.barplot(data=keyword_summary, x='Count', y='Keyword', palette=[keywords_colors[keyword] for keyword in keyword_summary['Keyword']])
-plt.title(f'Keyword Counts for {selected_category}')
+plt.title(f'Keyword Counts for {selected_category} ({selected_time_period})')
 plt.xlabel('Count')
 plt.ylabel('Keyword')
 plt.xticks(size=8)
