@@ -5,6 +5,25 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import re
 
+# Display the heading and manual
+st.title("DigCompEdu Bavaria-Analyse-Dashboard")
+st.write("""
+### Anleitung zur Verwendung des Dashboards
+
+Verwenden Sie die Dropdown-Menüs unten, um die angezeigten Daten nach Schulart und Zeitraum zu filtern.
+
+**Zeitraum auswählen:**
+- **Feb. 2023 - Aug. 2023**: Daten von Februar 2023 bis August 2023
+- **Sep. 2023 - Jan. 2024**: Daten von September 2023 bis Januar 2024
+- **Feb. 2024 - Aug. 2024**: Daten von Februar 2024 bis August 2024
+- **other**: Daten, die keinem der oben genannten Zeiträume entsprechen
+- **Alle Zeiträume**: Alle verfügbaren Daten anzeigen
+
+**Schulart auswählen:**
+- Wählen Sie eine spezifische Schulart aus, um die Daten nur für diese Schulart anzuzeigen.
+- Wählen Sie "alle Schularten", um die Daten für alle Schularten anzuzeigen.
+""")
+
 @st.cache_data
 def load_data():
     url = "https://alp.dillingen.de/-webservice-solr/alp-event/select?&fq=principal:false&q=*:*&sort=begin_date+asc&fq=is_cancelled:false&fq=(end_enrollment:[2024-06-20T00:00:00Z%20TO%20*]%20OR%20begin_date:[2024-06-20T00:00:00Z%20TO%20*])&rows=10000&start=0&wt=json&indent=on&facet=on&facet.limit=500&facet.field=schoolcategory&facet.field=keywords"
