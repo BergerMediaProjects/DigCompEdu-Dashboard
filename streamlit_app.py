@@ -68,12 +68,16 @@ keyword_summary = pd.DataFrame(list(keyword_counts.items()), columns=['Keyword',
 
 # Plot the keyword counts
 plt.figure(figsize=(10, 8))
-sns.barplot(data=keyword_summary, x='Count', y='Keyword')
+ax = sns.barplot(data=keyword_summary, x='Count', y='Keyword')
 plt.title(f'Keyword Counts for {selected_category}')
 plt.xlabel('Count')
 plt.ylabel('Keyword')
 plt.xticks(size=8)
 plt.yticks(size=8)
+
+# Add annotations to the bars
+for index, value in enumerate(keyword_summary['Count']):
+    ax.text(value, index, str(value), color='black', ha="left", va="center")
 
 # Display plot in Streamlit app
 st.pyplot(plt)
