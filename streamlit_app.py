@@ -3,19 +3,14 @@ import pandas as pd
 import streamlit as st
 
 # Show the page title and description.
-st.set_page_config(page_title="Movies dataset", page_icon="🎬")
-st.title("🎬 Movies dataset")
+st.set_page_config(page_title="ALP Dillingen", page_icon="🎬")
+st.title("DigCompEdu Bavaria")
 st.write(
     """
-    This app visualizes data from [The Movie Database (TMDB)](https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata).
-    It shows which movie genre performed best at the box office over the years. Just 
-    click on the widgets below to explore!
+    This app visualizes data from [ALP Dillingen](https://alp.dillingen.de/lehrerfortbildung/lehrgangsangebote/lehrgangssuche/).
+
     """
 )
-
-
-# Load the data from a CSV. We're caching this so it doesn't reload every time the app
-# reruns (e.g. if the user interacts with the widgets).
 
 import streamlit as st
 import pandas as pd
@@ -36,6 +31,12 @@ def load_data():
         # Convert each entry to a data frame and then concatenate them together
         lehrgaenge_list = [pd.DataFrame([item]) for item in lehrgaenge]
         lehrgaenge_df = pd.concat(lehrgaenge_list, ignore_index=True)
+        
+        # Add a new column containing the first part of the "token" variable
+        if 'token' in lehrgaenge_df.columns:
+            lehrgaenge_df['token_first_part'] = lehrgaenge_df['token'].str.split('/').str[0] # Assuming the delimiter is an underscore
+        
+        
         return lehrgaenge_df
     else:
         st.error("Failed to fetch data from the API")
@@ -49,12 +50,16 @@ st.write(df)
 
 
 
-# Show a multiselect widget with the genres using `st.multiselect`.
-genres = st.multiselect(
-    "Genres",
-    df.genre.unique(),
-    ["Action", "Adventure", "Biography", "Comedy", "Drama", "Horror"],
+# Show a multiselect widget with the school types using `st.multiselect`.
+schooltype = st.multiselect(
+    "Schulart",
+    df.schooltype.unique(),
+    ["Grundschule", "Realschule", "Gymnasium", "Mittelschule"],
 )
+
+
+
+
 
 # Show a slider widget with the years using `st.slider`.
 years = st.slider("Years", 1986, 2006, (2000, 2016))
