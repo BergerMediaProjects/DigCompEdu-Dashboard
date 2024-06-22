@@ -16,13 +16,38 @@ st.write(
 
 # Load the data from a CSV. We're caching this so it doesn't reload every time the app
 # reruns (e.g. if the user interacts with the widgets).
+
+import streamlit as st
+import pandas as pd
+import requests
+
+# Load the data from the API. We're caching this so it doesn't reload every time the app
+# reruns (e.g. if the user interacts with the widgets).
 @st.cache_data
 def load_data():
-    df = pd.read_csv("data/movies_genres_summary.csv")
-    return df
+    url = "https://alp.dillingen.de/-webservice-solr/alp-event/select?&fq=principal:false&q=*:*&sort=begin_date+asc&fq=is_cancelled:false&fq=(end_enrollment:[2024-06-20T00:00:00Z%20TO%20*]%20OR%20begin_date:[2024-06-20T00:00:00Z%20TO%20*])&rows=10000&start=0&wt=json&indent=on&facet=on&facet.limit=500&facet.field=schoolcategory&facet.field=keywords"
 
+    response = requests.get(url)
+    if response.status_code == 200:
+        content = response.json()
+        # Extract the relevant data from the JSON response
+        lehrgaenge = content['response']['docs']
+        
+        # Convert each entry to a data frame and then concatenate them together
+        lehrgaenge_list = [pd.DataFrame([item]) for item in lehrgaenge]
+        lehrgaenge_df = pd.concat(lehrgaenge_list, ignore_index=True)
+        return lehrgaenge_df
+    else:
+        st.error("Failed to fetch data from the API")
+        return pd.DataFrame()
 
+# Load data
 df = load_data()
+
+# Display data in Streamlit app
+st.write(df)
+
+
 
 # Show a multiselect widget with the genres using `st.multiselect`.
 genres = st.multiselect(
