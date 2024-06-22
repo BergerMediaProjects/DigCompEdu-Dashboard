@@ -28,27 +28,31 @@ def count_keywords(data, keywords):
     keyword_columns = [col for col in data.columns if 'keywords' in col.lower()]
     keyword_counts = {keyword: 0 for keyword in keywords}
     
-    # Debugging: Print the keyword columns and some of their content
-    st.write("Keyword columns found:", keyword_columns)
-    for col in keyword_columns:
-        st.write(f"Sample data in column '{col}':", data[col].head())
-    
     for keyword in keywords:
         regex_pattern = re.compile(r'\b' + re.escape(keyword) + r'\b', re.IGNORECASE)
         for column in keyword_columns:
             count = data[column].fillna("").apply(lambda x: bool(regex_pattern.search(str(x)))).sum()
             keyword_counts[keyword] += count
-            # Debugging: Print keyword count
-            st.write(f"Count for '{keyword}' in column '{column}': {count}")
     
     return keyword_counts
 
 # Define the list of keywords and their associated colors
+keywords = [
+    "Berufliche Kommunikation", "Kollegiale Zusammenarbeit", "Reflektiertes Handeln", "Kontinuierliche Weiterentwicklung",
+    "Auswählen digitaler Ressourcen", "Erstellen und Anpassen digitaler Ressourcen", "Organisieren, Schützen und Teilen digitaler Ressourcen",
+    "Lehren", "Lernbegleitung", "Kollaboratives Lernen", "Selbstgesteuertes Lernen",
+    "Lernstandserhebung", "Analyse der Lernevidenz", "Feedback und Planung",
+    "Barrierefreiheit und digitale Teilhabe", "Differenzierung", "Schüleraktivierung",
+    "Basiskompetenzen", "Suchen und Verarbeiten", "Kommunizieren und Kooperieren",
+    "Produzieren und Präsentieren", "Analysieren und Reflektieren"
+]
+
+# Mapping keywords to their respective colors
 keywords_colors = {
     "Berufliche Kommunikation": "#c74300",
     "Kollegiale Zusammenarbeit": "#c74300",
     "Reflektiertes Handeln": "#c74300",
-    "Digitale Weiterbildung": "#c74300",
+    "Kontinuierliche Weiterentwicklung": "#c74300",
     "Auswählen digitaler Ressourcen": "#00962c",
     "Erstellen und Anpassen digitaler Ressourcen": "#00962c",
     "Organisieren, Schützen und Teilen digitaler Ressourcen": "#00962c",
@@ -56,17 +60,17 @@ keywords_colors = {
     "Lernbegleitung": "#245eb8",
     "Kollaboratives Lernen": "#245eb8",
     "Selbstgesteuertes Lernen": "#245eb8",
-    "Lernstand erheben": "#006a66",
-    "Lern-Evidenzen analysieren": "#006a66",
+    "Lernstandserhebung": "#006a66",
+    "Analyse der Lernevidenz": "#006a66",
     "Feedback und Planung": "#006a66",
-    "Digitale Teilhabe": "#75006b",
-    "Differenzierung und Individualisierung": "#75006b",
-    "Aktive Einbindung der Lernenden": "#75006b",
-    "Informations- und Medienkompetenz": "#8f0000",
-    "Digitale Kommunikation und Zusammenarbeit": "#8f0000",
-    "Erstellung digitaler Inhalte": "#8f0000",
-    "Verantwortungsvoller Umgang mit digitalen Medien": "#8f0000",
-    "Digitales Problemlösen": "#8f0000"
+    "Barrierefreiheit und digitale Teilhabe": "#75006b",
+    "Differenzierung": "#75006b",
+    "Schüleraktivierung": "#75006b",
+    "Basiskompetenzen": "#8f0000",
+    "Suchen und Verarbeiten": "#8f0000",
+    "Kommunizieren und Kooperieren": "#8f0000",
+    "Produzieren und Präsentieren": "#8f0000",
+    "Analysieren und Reflektieren": "#8f0000"
 }
 
 # Load data
@@ -84,11 +88,7 @@ else:
     filtered_df = df
 
 # Count keywords in the filtered data
-keywords = list(keywords_colors.keys())
 keyword_counts = count_keywords(filtered_df, keywords)
-
-# Debugging: Check keyword counts
-st.write("Keyword counts:", keyword_counts)
 
 # Create a DataFrame for keyword counts
 keyword_summary = pd.DataFrame(list(keyword_counts.items()), columns=['Keyword', 'Count'])
