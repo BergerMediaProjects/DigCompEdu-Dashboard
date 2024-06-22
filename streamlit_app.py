@@ -131,6 +131,9 @@ time_period_mapping = {
     "120": "Sep. 2030 - Jan. 2031"
 }
 
+# Reverse mapping for the dropdown selection
+reverse_time_period_mapping = {v: k for k, v in time_period_mapping.items()}
+
 # Map the token values to human-readable time periods
 df['time_period'] = df['time_period'].map(time_period_mapping).fillna("other")
 
@@ -142,6 +145,9 @@ selected_category = st.selectbox("Select School Category", school_categories)
 # Filter by time periods
 time_periods = list(time_period_mapping.values()) + ["other", "All Time Periods"]
 selected_time_period = st.selectbox("Select Time Period", time_periods)
+
+# Map the selected human-readable time period back to the token value
+selected_token = reverse_time_period_mapping.get(selected_time_period, selected_time_period)
 
 # Filter the DataFrame based on the selected schoolcategory and time periods
 if selected_time_period != "All Time Periods":
