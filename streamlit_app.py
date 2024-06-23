@@ -30,7 +30,7 @@ def initialize_database():
 
 # Function to fetch and store data
 def fetch_and_store_data():
-    url = "https://alp.dillingen.de/-webservice-solr/alp-event/select?&fq=principal:false&q=*:*&sort=begin_date+asc&fq=is_cancelled:false&fq=(end_enrollment:[2024-06-20T00:00:00Z%20TO%20*]%20OR%20begin_date:[2024-06-20T00:00:00Z%20TO%20*])&rows=10000&start=0&wt=json&indent=on&facet=on&facet.limit=500&facet.field=schoolcategory&facet.field=keywords"
+    url = "https://alp.dillingen.de/-webservice-solr/alp-event/select?&fq=principal:false&q=*:*&sort=begin_date+asc&fq=is_cancelled:false&fq=(end_enrollment:[2030-12-31T00:00:00Z%20TO%20*]%20OR%20begin_date:[2015-06-20T00:00:00Z%20TO%20*])&rows=20000&start=0&wt=json&indent=on&facet=on&facet.limit=500&facet.field=schoolcategory&facet.field=keywords"
     response = requests.get(url)
     
     if response.status_code == 200:
@@ -137,6 +137,9 @@ else:
 
 # Mapping for the time periods
 time_period_mapping = {
+    "102/": "Aug '21 - Jan '22",
+    "103/": "Feb '22 - Aug '22",
+    "104/": "Aug '22 - Jan '23",
     "105/": "Feb '23 - Aug '23",
     "106/": "Sep '23 - Jan '24",
     "107/": "Feb '24 - Aug '24",
