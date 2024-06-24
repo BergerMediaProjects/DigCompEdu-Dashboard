@@ -221,6 +221,8 @@ keyword_counts = count_keywords(filtered_df, keywords)
 # Create a DataFrame for keyword counts
 keyword_summary = pd.DataFrame(list(keyword_counts.items()), columns=['Keyword', 'Count'])
 
+st.write("#### Barplot")
+
 # Plot the keyword counts with custom colors
 plt.figure(figsize=(10, 8))
 ax = sns.barplot(data=keyword_summary, x='Count', y='Keyword', palette=[keywords_colors[keyword] for keyword in keyword_summary['Keyword']])
@@ -241,7 +243,7 @@ st.pyplot(plt)
 num_entries_plotted = filtered_df.shape[0]
 
 # Display the count in a Streamlit widget
-st.write(f"Number of entries found: {num_entries_plotted}")
+st.write(f"Einträge gefunden: {num_entries_plotted}")
 
 # Function to count entries in the database
 def count_entries():
@@ -253,7 +255,7 @@ def count_entries():
 
 # Display the count in a Streamlit widget
 entry_count = count_entries()
-st.write(f"Total entries in the database: {entry_count}")
+st.write(f"Einträge in der Datenbank: {entry_count}")
 
 # Function to count keywords for each time period
 def count_keywords_by_time_period(data, keywords, time_period_column='time_period'):
@@ -277,6 +279,8 @@ keyword_counts_df = pd.DataFrame(keyword_counts, index=time_periods)
 # Map the time periods to their display labels
 time_period_labels = [time_period_mapping.get(tp, tp) for tp in time_periods]
 
+st.write(f"#### Zeitlicher Verlauf")
+
 # Plot the evolution of keyword counts across time periods
 plt.figure(figsize=(14, 8))
 for keyword in keywords:
@@ -293,5 +297,5 @@ plt.tight_layout()
 st.pyplot(plt)
 
 # Display the table with keyword counts below the plot
-st.write("### DigCompEdu Bavaria Label - Häufigkeiten")
+st.write("#### DigCompEdu Bavaria Label - Häufigkeiten")
 st.table(keyword_summary)
