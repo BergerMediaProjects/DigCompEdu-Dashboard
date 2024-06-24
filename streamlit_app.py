@@ -24,7 +24,7 @@ def run_subprocess():
         os.remove(FLAG_PATH)
     
     init_file_path = os.path.join(os.path.dirname(__file__), 'init.py')
-    result = subprocess.run(['python', init_file_path], capture_output=True, text=True)
+    result = subprocess.run([subprocess.run('python', init_file_path], capture_output=True, text=True)
     if result.returncode == 0:
         st.success("Datenbank erfolgreich geladen!")
         st.text(result.stdout)
