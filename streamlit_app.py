@@ -126,6 +126,9 @@ keywords_colors = {
 # Load data
 df = load_data()
 
+# Save data frame to csv
+df.to_csv('lehrgaenge_data.csv', index=False)
+
 # Ensure 'token' is a string and categorize time periods
 if 'json_token' in df.columns:
     df['json_token'] = df['json_token'].astype(str)
