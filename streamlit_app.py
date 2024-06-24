@@ -8,47 +8,39 @@ import re
 import os
 from datetime import datetime
 import json
-
-st.write("### DigCompEdu Bavaria Label Dashboard")
+import init
+import subprocess
 
 DATABASE_PATH = 'lehrgaenge_data.db'
+FLAG_PATH = 'subprocess_ran.flag'
 
-# Function to initialize the database
-def initialize_database():
-    conn = sqlite3.connect(DATABASE_PATH)
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS lehrgaenge (
-            id INTEGER PRIMARY KEY,
-            token TEXT UNIQUE,
-            data TEXT,
-            fetch_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    conn.commit()
-    conn.close()
+# Delete the flag file before running the subprocess
+if os.path.exists(FLAG_PATH):
+    os.remove(FLAG_PATH)
 
-# Function to fetch and store data
-def fetch_and_store_data():
-    url = "https://alp.dillingen.de/-webservice-solr/alp-event/select?&fq=principal:false&q=*:*&sort=begin_date+asc&fq=is_cancelled:false&fq=(end_enrollment:[2100-12-31T00:00:00Z%20TO%20*]%20OR%20begin_date:[1900-01-01T00:00:00Z%20TO%20*])&rows=10000&start=0&wt=json&indent=on&facet=on&facet.limit=500&facet.field=schoolcategory&facet.field=keywords"
-    response = requests.get(url)
+# Function to run the subprocess
+def run_subprocess():
+    # Delete the flag file before running the subprocess
+    if os.path.exists(FLAG_PATH):
+        os.remove(FLAG_PATH)
     
-    if response.status_code == 200:
-        content = response.json()
-        lehrgaenge = content['response']['docs']
-        lehrgaenge_df = pd.DataFrame(lehrgaenge)
-        
-        conn = sqlite3.connect(DATABASE_PATH)
-        for _, row in lehrgaenge_df.iterrows():
-            try:
-                conn.execute('INSERT INTO lehrgaenge (token, data) VALUES (?, ?)', (row['token'], json.dumps(row.to_dict())))
-            except sqlite3.IntegrityError:
-                # Ignore duplicate tokens
-                pass
-        conn.commit()
-        conn.close()
+    init_file_path = os.path.join(os.path.dirname(__file__), 'init.py')
+    result = subprocess.run(['python', init_file_path], capture_output=True, text=True)
+    if result.returncode == 0:
+        st.success("Datenbank erfolgreich geladen!")
+        st.text(result.stdout)
+        # Create a flag file to indicate the subprocess has run
+        with open(FLAG_PATH, 'w') as flag_file:
+            flag_file.write('subprocess has run')
     else:
-        st.error("Failed to fetch data from the API")
+        st.error("Fehler beim Aktualisieren der Datenbank")
+        st.text(result.stderr)
+        st.stop()
+
+# Check if the subprocess has run or if the database exists
+if not os.path.exists(FLAG_PATH):
+    st.info("Datenbank lädt.")
+    run_subprocess()
 
 # Function to load data from the database
 @st.cache_data
@@ -66,6 +58,11 @@ def load_data():
     df = pd.concat([df, df_data], axis=1)
     return df
 
+# Load data
+df = load_data()
+
+st.write("### DigCompEdu Bavaria Label Dashboard")
+
 # Function to count keywords
 def count_keywords(data, keywords):
     keyword_columns = [col for col in data.columns if 'keywords' in col.lower()]
@@ -78,13 +75,6 @@ def count_keywords(data, keywords):
             keyword_counts[keyword] += count
     
     return keyword_counts
-
-# Initialize database
-if not os.path.exists(DATABASE_PATH):
-    initialize_database()
-
-# Fetch and store data
-fetch_and_store_data()
 
 # Define the list of keywords and their associated colors
 keywords = [
@@ -122,9 +112,6 @@ keywords_colors = {
     "Produzieren und Präsentieren": "#8f0000",
     "Analysieren und Reflektieren": "#8f0000"
 }
-
-# Load data
-df = load_data()
 
 # Ensure 'token' is a string and categorize time periods
 if 'json_token' in df.columns:
@@ -209,7 +196,7 @@ if selected_category != "alle Formate" and 'json_eventtype' in df.columns:
     filtered_df = filtered_df[filtered_df['json_eventtype'].apply(lambda x: selected_category in x if isinstance(x, list) else x == selected_category)]
 
 # Selection of other keywords
-other_keywords = ["BayernCloud", "Unterricht_KI", "kein Kriterium ausgewählt"]
+other_keywords = ["kein Kriterium ausgewählt", "BayernCloud", "Unterricht_KI"]
 other_keywords = st.selectbox("Weiteres Kriterium wählen", other_keywords)
 
 if other_keywords != "kein Kriterium ausgewählt" and 'json_keywords' in df.columns:
@@ -299,3 +286,5 @@ st.pyplot(plt)
 # Display the table with keyword counts below the plot
 st.write("#### DigCompEdu Bavaria Label - Häufigkeiten")
 st.table(keyword_summary)
+
+
