@@ -30,7 +30,7 @@ def initialize_database():
 
 # Function to fetch and store data
 def fetch_and_store_data():
-    url = "https://alp.dillingen.de/-webservice-solr/alp-event/select?&fq=principal:false&q=*:*&sort=begin_date+asc&fq=is_cancelled:false&fq=(end_enrollment:[2030-12-31T00:00:00Z%20TO%20*]%20OR%20begin_date:[2015-06-20T00:00:00Z%20TO%20*])&rows=20000&start=0&wt=json&indent=on&facet=on&facet.limit=500&facet.field=schoolcategory&facet.field=keywords"
+    url = "https://alp.dillingen.de/-webservice-solr/alp-event/select?&fq=principal:false&q=*:*&sort=begin_date+asc&fq=is_cancelled:false&fq=(end_enrollment:[2100-12-31T00:00:00Z%20TO%20*]%20OR%20begin_date:[1900-01-01T00:00:00Z%20TO%20*])&rows=10000&start=0&wt=json&indent=on&facet=on&facet.limit=500&facet.field=schoolcategory&facet.field=keywords"
     response = requests.get(url)
     
     if response.status_code == 200:
@@ -164,18 +164,18 @@ time_period_mapping = {
 # Get unique time periods and append "Alle Zeiträume"
 time_periods = df['time_period'].unique().tolist()
 time_periods = [tp for tp in time_periods if tp in time_period_mapping]  # Filter only valid time periods
-time_periods.append("Alle Zeiträume")
+time_periods.append("Alle verfügbaren Zeiträume")
 
 # Create a display mapping for dropdown
 time_period_display = {tp: time_period_mapping.get(tp, tp) for tp in time_periods}
-time_period_display["Alle Zeiträume"] = "Alle Zeiträume"
+time_period_display["Alle verfügbaren Zeiträume"] = "Alle verfügbaren Zeiträume"
 
 # Dropdown for time periods
 selected_time_period_display = st.selectbox("Zeitraum wählen", list(time_period_display.values()))
 selected_time_period = [k for k, v in time_period_display.items() if v == selected_time_period_display][0]
 
 # Filter the DataFrame based on the selected schoolcategory and time periods
-if selected_time_period != "Alle Zeiträume":
+if selected_time_period != "Alle verfügbaren Zeiträume":
     filtered_df = df[df['time_period'] == selected_time_period]
 else:
     filtered_df = df
@@ -209,6 +209,24 @@ plt.yticks(size=8)
 
 # Display plot in Streamlit app
 st.pyplot(plt)
+
+# Count the number of entries that are currently being plotted
+num_entries_plotted = filtered_df.shape[0]
+
+# Display the count in a Streamlit widget
+st.write(f"Number of entries plotted: {num_entries_plotted}")
+
+# Function to count entries in the database
+def count_entries():
+    conn = sqlite3.connect(DATABASE_PATH)
+    query = "SELECT COUNT(*) FROM lehrgaenge"
+    count = pd.read_sql(query, conn).iloc[0, 0]
+    conn.close()
+    return count
+
+# Display the count in a Streamlit widget
+entry_count = count_entries()
+st.write(f"Total entries in the database: {entry_count}")
 
 # Display the table with keyword counts below the plot
 st.write("### DigCompEdu Bavaria Label - Häufigkeiten")
