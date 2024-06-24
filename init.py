@@ -1,4 +1,3 @@
-import streamlit as st
 import pandas as pd
 import requests
 import sqlite3
@@ -8,6 +7,7 @@ import re
 import os
 from datetime import datetime
 import json
+import streamlit as st
 
 DATABASE_PATH = 'lehrgaenge_data.db'
 FLAG_PATH = 'subprocess_ran.flag'
