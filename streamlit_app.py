@@ -33,13 +33,13 @@ def run_subprocess():
         with open(FLAG_PATH, 'w') as flag_file:
             flag_file.write('subprocess has run')
     else:
-        st.error("Fehler beim Aktualisieren der Datenbank")
+        st.error("Fehler beim Initialisieren der Datenbank")
         st.text(result.stderr)
         st.stop()
 
 # Check if the subprocess has run or if the database exists
 if not os.path.exists(FLAG_PATH):
-    st.info("Datenbank lädt.")
+    st.info("Datenbank wird geladen.")
     run_subprocess()
 
 # Function to load data from the database
