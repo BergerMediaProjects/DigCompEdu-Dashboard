@@ -8,7 +8,6 @@ import re
 import os
 from datetime import datetime
 import json
-import init
 import subprocess
 
 DATABASE_PATH = 'lehrgaenge_data.db'
