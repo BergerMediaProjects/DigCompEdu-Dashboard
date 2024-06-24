@@ -126,9 +126,6 @@ keywords_colors = {
 # Load data
 df = load_data()
 
-# Save data frame to csv
-df.to_csv('lehrgaenge_data.csv', index=False)
-
 # Ensure 'token' is a string and categorize time periods
 if 'json_token' in df.columns:
     df['json_token'] = df['json_token'].astype(str)
@@ -192,6 +189,32 @@ selected_category = st.selectbox("Schulart wählen", school_categories)
 if selected_category != "alle Schularten" and 'json_schoolcategory' in df.columns:
     filtered_df = filtered_df[filtered_df['json_schoolcategory'].apply(lambda x: selected_category in x if isinstance(x, list) else x == selected_category)]
 
+# Selection of school subjects
+school_subjects = ["alle Fächer", "Deutsch", "Englisch", "Mathematik", "Informatik", "Biologie", "Chemie", "Physik", "Musik", "Musikerziehung", "Kunst", "Französisch", "Latein", "Sport", "fächerübergreifend", "Fächerübergr. Bildungsaufgaben"]
+selected_subject = st.selectbox("Schulfach wählen", school_subjects)
+
+if selected_subject != "alle Fächer" and 'json_keywords' in df.columns:
+    filtered_df = filtered_df[filtered_df['json_keywords'].apply(lambda x: selected_subject in x if isinstance(x, list) else x == selected_subject)]
+
+# Check if 'json_eventtype' column exists
+if 'json_eventtype' in df.columns:
+    eventtype_categories = df['json_eventtype'].explode().unique()
+    eventtype_categories = ["alle Formate"] + list(eventtype_categories)
+else:
+    eventtype_categories = ["alle Formate"]
+
+selected_category = st.selectbox("Format wählen", eventtype_categories)
+
+if selected_category != "alle Formate" and 'json_eventtype' in df.columns:
+    filtered_df = filtered_df[filtered_df['json_eventtype'].apply(lambda x: selected_category in x if isinstance(x, list) else x == selected_category)]
+
+# Selection of other keywords
+other_keywords = ["BayernCloud", "Unterricht_KI", "kein Kriterium ausgewählt"]
+other_keywords = st.selectbox("Weiteres Kriterium wählen", other_keywords)
+
+if other_keywords != "kein Kriterium ausgewählt" and 'json_keywords' in df.columns:
+    filtered_df = filtered_df[filtered_df['json_keywords'].apply(lambda x: other_keywords in x if isinstance(x, list) else x == other_keywords)]
+
 # Count keywords in the filtered data
 keyword_counts = count_keywords(filtered_df, keywords)
 
@@ -214,12 +237,11 @@ for index, value in enumerate(keyword_summary['Count']):
 # Display plot in Streamlit app
 st.pyplot(plt)
 
-
 # Count the number of entries that are currently being plotted
 num_entries_plotted = filtered_df.shape[0]
 
 # Display the count in a Streamlit widget
-st.write(f"Number of entries plotted: {num_entries_plotted}")
+st.write(f"Number of entries found: {num_entries_plotted}")
 
 # Function to count entries in the database
 def count_entries():
@@ -260,7 +282,7 @@ plt.figure(figsize=(14, 8))
 for keyword in keywords:
     plt.plot(time_period_labels, keyword_counts_df[keyword], label=keyword, color=keywords_colors[keyword])
 
-plt.title('Evolution of Keyword Counts Across Time Periods')
+plt.title('Keyword Counts Across Time Periods')
 plt.xlabel('Time Period')
 plt.ylabel('Count')
 plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
