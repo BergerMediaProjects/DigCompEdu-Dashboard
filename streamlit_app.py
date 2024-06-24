@@ -228,6 +228,43 @@ def count_entries():
 entry_count = count_entries()
 st.write(f"Total entries in the database: {entry_count}")
 
+# Function to count keywords for each time period
+def count_keywords_by_time_period(data, keywords, time_period_column='time_period'):
+    keyword_counts = {keyword: [] for keyword in keywords}
+    time_periods = data[time_period_column].unique()
+    
+    for time_period in sorted(time_periods):
+        period_data = data[data[time_period_column] == time_period]
+        period_counts = count_keywords(period_data, keywords)
+        for keyword in keywords:
+            keyword_counts[keyword].append(period_counts[keyword])
+    
+    return keyword_counts, sorted(time_periods)
+
+# Calculate keyword counts for each time period
+keyword_counts, time_periods = count_keywords_by_time_period(df, keywords)
+
+# Convert keyword counts to a DataFrame for easier plotting
+keyword_counts_df = pd.DataFrame(keyword_counts, index=time_periods)
+
+# Map the time periods to their display labels
+time_period_labels = [time_period_mapping.get(tp, tp) for tp in time_periods]
+
+# Plot the evolution of keyword counts across time periods
+plt.figure(figsize=(14, 8))
+for keyword in keywords:
+    plt.plot(time_period_labels, keyword_counts_df[keyword], label=keyword, color=keywords_colors[keyword])
+
+plt.title('Evolution of Keyword Counts Across Time Periods')
+plt.xlabel('Time Period')
+plt.ylabel('Count')
+plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+plt.xticks(rotation=45)
+plt.tight_layout()
+
+# Display the plot in the Streamlit app
+st.pyplot(plt)
+
 # Display the table with keyword counts below the plot
 st.write("### DigCompEdu Bavaria Label - Häufigkeiten")
 st.table(keyword_summary)
