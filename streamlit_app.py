@@ -207,8 +207,13 @@ plt.ylabel('Keyword')
 plt.xticks(size=8)
 plt.yticks(size=8)
 
+# Add labels inside the bars
+for index, value in enumerate(keyword_summary['Count']):
+    ax.text(value - 0.1, index, str(value), color='white', ha="right", va="center")
+
 # Display plot in Streamlit app
 st.pyplot(plt)
+
 
 # Count the number of entries that are currently being plotted
 num_entries_plotted = filtered_df.shape[0]
