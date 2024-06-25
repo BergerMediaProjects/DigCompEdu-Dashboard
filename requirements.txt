@@ -3,3 +3,9 @@ pandas
 requests
 matplotlib
 seaborn
+sqlite3
+re
+os
+datetime
+json
+subprocess
