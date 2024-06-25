@@ -16,11 +16,11 @@ FLAG_PATH = 'subprocess_ran.flag'
 
 # Function to run the subprocess
 def run_subprocess():
-    st.write("Running subprocess to initialize or update the database.")
+    st.write("Datenbank-Update läuft.")
     init_file_path = os.path.join(os.path.dirname(__file__), 'launch.py')
     result = subprocess.run([sys.executable, init_file_path], capture_output=True, text=True)
     if result.returncode == 0:
-        st.success("Datenbank erfolgreich geladen!")
+        st.success("Datenbank erfolgreich aktualisiert!")
         st.text(result.stdout)
         # Create a flag file to indicate the subprocess has run
         with open(FLAG_PATH, 'w') as flag_file:
@@ -33,7 +33,6 @@ def run_subprocess():
 # Function to load data from the database
 @st.cache_data
 def load_data():
-    st.write("Loading data from the database.")
     conn = sqlite3.connect(DATABASE_PATH)
     query = "SELECT * FROM lehrgaenge"
     df = pd.read_sql(query, conn)
@@ -47,21 +46,15 @@ def load_data():
     df = pd.concat([df, df_data], axis=1)
     return df
 
-# Check if the flag file exists in session state
-if 'flag_checked' not in st.session_state:
-    st.session_state.flag_checked = False
+# Ensure the subprocess runs only once during the initial page load
+if 'subprocess_ran' not in st.session_state:
+    st.session_state.subprocess_ran = False
 
-# Run the subprocess if it hasn't been checked
-if not st.session_state.flag_checked:
-    st.session_state.flag_checked = True
-    if not os.path.exists(FLAG_PATH):
-        st.info("Datenbank wird aktualisiert.")
-        run_subprocess()
-    else:
-        st.write("Database already initialized.")
+if not st.session_state.subprocess_ran:
+    st.session_state.subprocess_ran = True
+    run_subprocess()
 
 # Load data
-st.write("Loading data.")
 df = load_data()
 
 st.write("### DigCompEdu Bavaria Label Dashboard")
