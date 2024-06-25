@@ -9,6 +9,7 @@ import os
 from datetime import datetime
 import json
 import subprocess
+import sys
 
 DATABASE_PATH = 'lehrgaenge_data.db'
 FLAG_PATH = 'subprocess_ran.flag'
@@ -24,7 +25,7 @@ def run_subprocess():
         os.remove(FLAG_PATH)
     
     init_file_path = os.path.join(os.path.dirname(__file__), 'launch.py')
-    result = subprocess.run(['python', init_file_path], capture_output=True, text=True)
+    result = subprocess.run([sys.executable, init_file_path], capture_output=True, text=True)
     if result.returncode == 0:
         st.success("Datenbank erfolgreich geladen!")
         st.text(result.stdout)
