@@ -4,5 +4,4 @@ requests
 matplotlib
 seaborn
 datetime
-json
 subprocess
