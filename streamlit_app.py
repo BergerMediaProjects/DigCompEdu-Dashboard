@@ -14,16 +14,8 @@ import sys
 DATABASE_PATH = 'lehrgaenge_data.db'
 FLAG_PATH = 'subprocess_ran.flag'
 
-# Delete the flag file before running the subprocess
-if os.path.exists(FLAG_PATH):
-    os.remove(FLAG_PATH)
-
 # Function to run the subprocess
 def run_subprocess():
-    # Delete the flag file before running the subprocess
-    if os.path.exists(FLAG_PATH):
-        os.remove(FLAG_PATH)
-    
     init_file_path = os.path.join(os.path.dirname(__file__), 'launch.py')
     result = subprocess.run([sys.executable, init_file_path], capture_output=True, text=True)
     if result.returncode == 0:
@@ -36,11 +28,6 @@ def run_subprocess():
         st.error("Fehler beim Initialisieren der Datenbank")
         st.text(result.stderr)
         st.stop()
-
-# Check if the subprocess has run or if the database exists
-if not os.path.exists(FLAG_PATH):
-    st.info("Datenbank wird geladen.")
-    run_subprocess()
 
 # Function to load data from the database
 @st.cache_data
@@ -57,6 +44,11 @@ def load_data():
     df = df.drop(columns=['data'])  # Drop the original 'data' column before merging
     df = pd.concat([df, df_data], axis=1)
     return df
+
+# Check if the subprocess has run or if the database exists
+if not os.path.exists(FLAG_PATH):
+    st.info("Datenbank wird geladen.")
+    run_subprocess()
 
 # Load data
 df = load_data()
@@ -300,5 +292,3 @@ st.pyplot(plt)
 # Display the table with keyword counts below the plot
 st.write("#### DigCompEdu Bavaria Label - Häufigkeiten")
 st.table(keyword_summary)
-
-
