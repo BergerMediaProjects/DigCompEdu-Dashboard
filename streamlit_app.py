@@ -75,41 +75,55 @@ def count_keywords(data, keywords):
     
     return keyword_counts
 
-# Define the list of keywords and their associated colors
 keywords = [
-    "Berufliche Kommunikation", "Kollegiale Zusammenarbeit", "Reflektiertes Handeln", "Kontinuierliche Weiterentwicklung",
-    "Auswählen digitaler Ressourcen", "Erstellen und Anpassen digitaler Ressourcen", "Organisieren, Schützen und Teilen digitaler Ressourcen",
-    "Lehren", "Lernbegleitung", "Kollaboratives Lernen", "Selbstgesteuertes Lernen",
-    "Lernstandserhebung", "Analyse der Lernevidenz", "Feedback und Planung",
-    "Barrierefreiheit und digitale Teilhabe", "Differenzierung", "Schüleraktivierung",
-    "Basiskompetenzen", "Suchen und Verarbeiten", "Kommunizieren und Kooperieren",
-    "Produzieren und Präsentieren", "Analysieren und Reflektieren"
+    "1.1 Berufliche Kommunikation",
+    "1.2 Kollegiale Zusammenarbeit",
+    "1.3 Reflektiertes Handeln",
+    "1.4 Kontinuierliche Weiterentwicklung",
+    "2.1 Auswählen digitaler Ressourcen",
+    "2.2 Erstellen und Anpassen digitaler Ressourcen",
+    "2.3 Organisieren, Schützen und Teilen digitaler Ressourcen",
+    "3.1 Lehren",
+    "3.2 Lernbegleitung",
+    "3.3 Kollaboratives Lernen",
+    "3.4 Selbstgesteuertes Lernen",
+    "4.1 Lernstandserhebung",
+    "4.2 Analyse der Lernevidenz",
+    "4.3 Feedback und Planung",
+    "5.1 Barrierefreiheit und digitale Teilhabe",
+    "5.2 Differenzierung",
+    "5.3 Schüleraktivierung",
+    "6.1 Basiskompetenzen",
+    "6.2 Suchen und Verarbeiten",
+    "6.3 Kommunizieren und Kooperieren",
+    "6.4 Produzieren und Präsentieren",
+    "6.5 Analysieren und Reflektieren"
 ]
 
-# Mapping keywords to their respective colors
+# Mapping updated keywords to their respective colors
 keywords_colors = {
-    "Berufliche Kommunikation": "#c74300",
-    "Kollegiale Zusammenarbeit": "#c74300",
-    "Reflektiertes Handeln": "#c74300",
-    "Kontinuierliche Weiterentwicklung": "#c74300",
-    "Auswählen digitaler Ressourcen": "#00962c",
-    "Erstellen und Anpassen digitaler Ressourcen": "#00962c",
-    "Organisieren, Schützen und Teilen digitaler Ressourcen": "#00962c",
-    "Lehren": "#245eb8",
-    "Lernbegleitung": "#245eb8",
-    "Kollaboratives Lernen": "#245eb8",
-    "Selbstgesteuertes Lernen": "#245eb8",
-    "Lernstandserhebung": "#006a66",
-    "Analyse der Lernevidenz": "#006a66",
-    "Feedback und Planung": "#006a66",
-    "Barrierefreiheit und digitale Teilhabe": "#75006b",
-    "Differenzierung": "#75006b",
-    "Schüleraktivierung": "#75006b",
-    "Basiskompetenzen": "#8f0000",
-    "Suchen und Verarbeiten": "#8f0000",
-    "Kommunizieren und Kooperieren": "#8f0000",
-    "Produzieren und Präsentieren": "#8f0000",
-    "Analysieren und Reflektieren": "#8f0000"
+    "1.1 Berufliche Kommunikation": "#c74300",
+    "1.2 Kollegiale Zusammenarbeit": "#c74300",
+    "1.3 Reflektiertes Handeln": "#c74300",
+    "1.4 Kontinuierliche Weiterentwicklung": "#c74300",
+    "2.1 Auswählen digitaler Ressourcen": "#00962c",
+    "2.2 Erstellen und Anpassen digitaler Ressourcen": "#00962c",
+    "2.3 Organisieren, Schützen und Teilen digitaler Ressourcen": "#00962c",
+    "3.1 Lehren": "#245eb8",
+    "3.2 Lernbegleitung": "#245eb8",
+    "3.3 Kollaboratives Lernen": "#245eb8",
+    "3.4 Selbstgesteuertes Lernen": "#245eb8",
+    "4.1 Lernstandserhebung": "#006a66",
+    "4.2 Analyse der Lernevidenz": "#006a66",
+    "4.3 Feedback und Planung": "#006a66",
+    "5.1 Barrierefreiheit und digitale Teilhabe": "#75006b",
+    "5.2 Differenzierung": "#75006b",
+    "5.3 Schüleraktivierung": "#75006b",
+    "6.1 Basiskompetenzen": "#8f0000",
+    "6.2 Suchen und Verarbeiten": "#8f0000",
+    "6.3 Kommunizieren und Kooperieren": "#8f0000",
+    "6.4 Produzieren und Präsentieren": "#8f0000",
+    "6.5 Analysieren und Reflektieren": "#8f0000"
 }
 
 # Ensure 'token' is a string and categorize time periods
