@@ -10,6 +10,7 @@ from datetime import datetime
 import json
 import subprocess
 import sys
+import plotly
 
 DATABASE_PATH = 'lehrgaenge_data.db'
 FLAG_PATH = 'subprocess_ran.flag'
@@ -296,3 +297,44 @@ st.pyplot(plt)
 # Display the table with keyword counts below the plot
 st.write("#### DigCompEdu Bavaria Label - Häufigkeiten")
 st.table(keyword_summary)
+
+import plotly.express as px
+
+# Create a dictionary for custom colors based on the keywords
+custom_colors = [keywords_colors[keyword] for keyword in keyword_summary['Keyword']]
+
+# Create the Plotly bar plot
+fig = px.bar(
+    keyword_summary,
+    x='Count',
+    y='Keyword',
+    orientation='h',
+    color='Keyword',
+    color_discrete_sequence=custom_colors,
+    title=f'Keyword Counts for {selected_category} ({selected_time_period_display})'
+)
+
+# Update the layout for better readability
+fig.update_layout(
+    xaxis_title='Count',
+    yaxis_title='Keyword',
+    font=dict(size=12),
+    title=dict(font=dict(size=18)),
+    showlegend=False,
+)
+
+# Add labels inside the bars
+for i in range(len(keyword_summary)):
+    fig.add_annotation(
+        x=keyword_summary['Count'][i],
+        y=keyword_summary['Keyword'][i],
+        text=str(keyword_summary['Count'][i]),
+        showarrow=False,
+        font=dict(color='white'),
+        xanchor='right'
+    )
+
+#Headline for Plotly Plot
+st.write("#### Interactive graphic")
+# Display plot in Streamlit app
+st.plotly_chart(fig)
