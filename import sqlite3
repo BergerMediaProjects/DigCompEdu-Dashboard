@@ -1,0 +1,13 @@
+import sqlite3
+import pandas as pd
+
+conn = sqlite3.connect('lehrgaenge_data.db')
+df = pd.read_sql("SELECT token FROM lehrgaenge", conn)
+conn.close()
+
+# Show the first 10 unique tokens
+print(df['token'].unique()[:20])
+
+# Show the first 10 unique prefixes (first 4 characters)
+df['prefix'] = df['token'].str[:10]
+print(df['prefix'].unique())

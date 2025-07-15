@@ -128,77 +128,77 @@ keywords_colors = {
 if 'json_token' in df.columns:
     df['json_token'] = df['json_token'].astype(str)
     
-    # Match tokens with the format NNN/
-    df['time_period'] = df['json_token'].apply(lambda x: x[:4] if re.match(r'\d{3}/', x[:4]) else 'other')
+    # Mapping for the time periods (bracketed codes omitted for display)
+    time_period_mapping = {
+        "102/": "Aug '21 - Jan '22",
+        "103/": "Feb '22 - Aug '22",
+        "104/": "Aug '22 - Jan '23",
+        "105/": "Feb '23 - Aug '23",
+        "106/": "Sep '23 - Jan '24",
+        "23-24.1": "Sep '23 - Jan '24",
+        "107/": "Feb '24 - Aug '24",
+        "23-24.2": "Feb '24 - Aug '24",
+        "108/": "Sep '24 - Jan '25",
+        "24-25.1": "Sep '24 - Jan '25",
+        "109/": "Feb '25 - Aug '25",
+        "24-25.2": "Feb '25 - Aug '25",
+        "110/": "Sep '25 - Jan '26",
+        "25-26.1": "Sep '25 - Jan '26",
+        "111/": "Feb '26 - Aug '26",
+        "25-26.2": "Feb '26 - Aug '26",
+        "112/": "Sep '26 - Jan '27",
+        "26-27.1": "Sep '26 - Jan '27",
+        "113/": "Feb '27 - Aug '27",
+        "26-27.2": "Feb '27 - Aug '27",
+        "114/": "Sep '27 - Jan '28",
+        "27-28.1": "Sep '27 - Jan '28",
+        "115/": "Feb '28 - Aug '28",
+        "27-28.2": "Feb '28 - Aug '28",
+        "116/": "Sep '28 - Jan '29",
+        "28-29.1": "Sep '28 - Jan '29",
+        "117/": "Feb '29 - Aug '29",
+        "28-29.2": "Feb '29 - Aug '29",
+        "118/": "Sep '29 - Jan '30",
+        "29-30.1": "Sep '29 - Jan '30",
+        "119/": "Feb '30 - Aug '30",
+        "29-30.2": "Feb '30 - Aug '30",
+        "120/": "Sep '30 - Jan '31",
+        "30-31.1": "Sep '30 - Jan '31",
+    }
+    
+    # Support both old (NNN/) and new (YY-YY.N) token formats
+    def extract_time_period(token):
+        if re.match(r'\d{3}/', token[:4]):
+            return token[:4]
+        match = re.match(r'(\d{2}-\d{2}\.\d)', token)
+        if match:
+            return match.group(1)
+        return 'other'
+    df['time_period'] = df['json_token'].apply(extract_time_period)
+    # Filter out rows with 'other' as time_period (not mapped)
+    df = df[df['time_period'].isin(list(time_period_mapping.keys()))]
 else:
     st.error("Token column is missing from the data")
 
-# Mapping for the time periods (with new naming system from 106/ onwards)
-time_period_mapping = {
-    "102/": "Aug '21 - Jan '22",
-    "103/": "Feb '22 - Aug '22",
-    "104/": "Aug '22 - Jan '23",
-    "105/": "Feb '23 - Aug '23",
-
-    "106/": "Sep '23 - Jan '24 (23-24.1)",
-    "23-24.1": "Sep '23 - Jan '24 (23-24.1)",
-
-    "107/": "Feb '24 - Aug '24 (23-24.2)",
-    "23-24.2": "Feb '24 - Aug '24 (23-24.2)",
-
-    "108/": "Sep '24 - Jan '25 (24-25.1)",
-    "24-25.1": "Sep '24 - Jan '25 (24-25.1)",
-
-    "109/": "Feb '25 - Aug '25 (24-25.2)",
-    "24-25.2": "Feb '25 - Aug '25 (24-25.2)",
-
-    "110/": "Sep '25 - Jan '26 (25-26.1)",
-    "25-26.1": "Sep '25 - Jan '26 (25-26.1)",
-
-    "111/": "Feb '26 - Aug '26 (25-26.2)",
-    "25-26.2": "Feb '26 - Aug '26 (25-26.2)",
-
-    "112/": "Sep '26 - Jan '27 (26-27.1)",
-    "26-27.1": "Sep '26 - Jan '27 (26-27.1)",
-
-    "113/": "Feb '27 - Aug '27 (26-27.2)",
-    "26-27.2": "Feb '27 - Aug '27 (26-27.2)",
-
-    "114/": "Sep '27 - Jan '28 (27-28.1)",
-    "27-28.1": "Sep '27 - Jan '28 (27-28.1)",
-
-    "115/": "Feb '28 - Aug '28 (27-28.2)",
-    "27-28.2": "Feb '28 - Aug '28 (27-28.2)",
-
-    "116/": "Sep '28 - Jan '29 (28-29.1)",
-    "28-29.1": "Sep '28 - Jan '29 (28-29.1)",
-
-    "117/": "Feb '29 - Aug '29 (28-29.2)",
-    "28-29.2": "Feb '29 - Aug '29 (28-29.2)",
-
-    "118/": "Sep '29 - Jan '30 (29-30.1)",
-    "29-30.1": "Sep '29 - Jan '30 (29-30.1)",
-
-    "119/": "Feb '30 - Aug '30 (29-30.2)",
-    "29-30.2": "Feb '30 - Aug '30 (29-30.2)",
-
-    "120/": "Sep '30 - Jan '31 (30-31.1)",
-    "30-31.1": "Sep '30 - Jan '31 (30-31.1)",
-}
 
 
 # Get unique time periods and append "Alle Zeiträume"
-time_periods = df['time_period'].unique().tolist()
-time_periods = [tp for tp in time_periods if tp in time_period_mapping]  # Filter only valid time periods
-time_periods.append("Alle verfügbaren Zeiträume")
 
-# Create a display mapping for dropdown
-time_period_display = {tp: time_period_mapping.get(tp, tp) for tp in time_periods}
-time_period_display["Alle verfügbaren Zeiträume"] = "Alle verfügbaren Zeiträume"
+# Only use mapped time periods for dropdown and plots
 
-# Dropdown for time periods
-selected_time_period_display = st.selectbox("Zeitraum wählen", list(time_period_display.values()))
-selected_time_period = [k for k, v in time_period_display.items() if v == selected_time_period_display][0]
+# Build a mapping from display value to the first matching key in the mapping that is present in the data
+display_to_key = {}
+for tp in time_period_mapping.keys():
+    if tp in df['time_period'].unique():
+        display = time_period_mapping[tp]
+        if display not in display_to_key:
+            display_to_key[display] = tp
+# Add the 'Alle verfügbaren Zeiträume' option
+display_to_key["Alle verfügbaren Zeiträume"] = "Alle verfügbaren Zeiträume"
+
+# Dropdown for time periods (deduplicated by display value)
+selected_time_period_display = st.selectbox("Zeitraum wählen", list(display_to_key.keys()))
+selected_time_period = display_to_key[selected_time_period_display]
 
 # Filter the DataFrame based on the selected schoolcategory and time periods
 if selected_time_period != "Alle verfügbaren Zeiträume":
@@ -289,32 +289,49 @@ st.write(f"Einträge in der Datenbank: {entry_count}")
 # Function to count keywords for each time period
 def count_keywords_by_time_period(data, keywords, time_period_column='time_period'):
     keyword_counts = {keyword: [] for keyword in keywords}
-    time_periods = data[time_period_column].unique()
-    
-    for time_period in sorted(time_periods):
+    # Get unique time periods in the order of time_period_mapping
+    period_order = [tp for tp in time_period_mapping.keys() if tp in data[time_period_column].unique()]
+    for time_period in period_order:
         period_data = data[data[time_period_column] == time_period]
         period_counts = count_keywords(period_data, keywords)
         for keyword in keywords:
             keyword_counts[keyword].append(period_counts[keyword])
-    
-    return keyword_counts, sorted(time_periods)
+    return keyword_counts, period_order
 
 # Calculate keyword counts for each time period
 keyword_counts, time_periods = count_keywords_by_time_period(df, keywords)
 
 # Convert keyword counts to a DataFrame for easier plotting
-keyword_counts_df = pd.DataFrame(keyword_counts, index=time_periods)
 
-# Map the time periods to their display labels
+keyword_counts_df = pd.DataFrame(keyword_counts, index=time_periods)
+# Map the time periods to their display labels, preserving order
+
 time_period_labels = [time_period_mapping.get(tp, tp) for tp in time_periods]
+
+# Prepare data for Plotly and aggregate duplicate periods, then sort by mapping order (needed for both Plotly and matplotlib)
+keyword_counts_long = keyword_counts_df.reset_index().melt(id_vars='index', var_name='Keyword', value_name='Count')
+keyword_counts_long = keyword_counts_long.rename(columns={'index': 'Time Period'})
+keyword_counts_long['Time Period'] = keyword_counts_long['Time Period'].map(time_period_mapping).fillna(keyword_counts_long['Time Period'])
+# Aggregate counts for each (Time Period, Keyword) pair
+keyword_counts_long = keyword_counts_long.groupby(['Time Period', 'Keyword'], as_index=False)['Count'].sum()
+# Sort by the order in time_period_mapping
+period_order = list(dict.fromkeys(time_period_mapping.values()))
+keyword_counts_long['Time Period'] = pd.Categorical(keyword_counts_long['Time Period'], categories=period_order, ordered=True)
+keyword_counts_long = keyword_counts_long.sort_values(['Time Period', 'Keyword'])
 
 st.write(f"#### Zeitlicher Verlauf")
 
-# Plot the evolution of keyword counts across time periods
+
+# Plot the evolution of keyword counts across time periods using the aggregated data
 plt.figure(figsize=(14, 8))
 for keyword in keywords:
-    plt.plot(time_period_labels, keyword_counts_df[keyword], label=keyword, color=keywords_colors[keyword])
-
+    data = keyword_counts_long[keyword_counts_long['Keyword'] == keyword]
+    plt.plot(
+        data['Time Period'],
+        data['Count'],
+        label=keyword,
+        color=keywords_colors[keyword]
+    )
 plt.title('Keyword Counts Across Time Periods')
 plt.xlabel('Time Period')
 plt.ylabel('Count')
@@ -369,3 +386,64 @@ for i in range(len(keyword_summary)):
 st.write("#### Interactive graphic")
 # Display plot in Streamlit app
 st.plotly_chart(fig)
+
+import plotly.express as px
+
+# Prepare data for Plotly and aggregate duplicate periods, then sort by mapping order
+keyword_counts_long = keyword_counts_df.reset_index().melt(id_vars='index', var_name='Keyword', value_name='Count')
+keyword_counts_long = keyword_counts_long.rename(columns={'index': 'Time Period'})
+keyword_counts_long['Time Period'] = keyword_counts_long['Time Period'].map(time_period_mapping).fillna(keyword_counts_long['Time Period'])
+# Aggregate counts for each (Time Period, Keyword) pair
+keyword_counts_long = keyword_counts_long.groupby(['Time Period', 'Keyword'], as_index=False)['Count'].sum()
+# Sort by the order in time_period_mapping
+period_order = list(dict.fromkeys(time_period_mapping.values()))
+keyword_counts_long['Time Period'] = pd.Categorical(keyword_counts_long['Time Period'], categories=period_order, ordered=True)
+keyword_counts_long = keyword_counts_long.sort_values(['Time Period', 'Keyword'])
+
+# Add a selectbox to choose a single keyword
+
+selected_keyword = st.selectbox("Keyword für Verlauf wählen", keywords)
+filtered_keyword_df = keyword_counts_long[keyword_counts_long['Keyword'] == selected_keyword]
+
+# Create interactive line chart for the selected keyword
+
+fig_single = px.line(
+    filtered_keyword_df,
+    x='Time Period',
+    y='Count',
+    markers=True,
+    title=f"Verlauf für: {selected_keyword}",
+    color_discrete_sequence=[keywords_colors[selected_keyword]]
+)
+fig_single.update_layout(
+    xaxis_title='Time Period',
+    yaxis_title='Count',
+    font=dict(size=12),
+    title=dict(font=dict(size=18)),
+    hovermode='x unified',
+    xaxis={'categoryorder':'array', 'categoryarray': period_order}
+)
+st.plotly_chart(fig_single, use_container_width=True)
+
+# Create interactive line chart
+
+fig = px.line(
+    keyword_counts_long,
+    x='Time Period',
+    y='Count',
+    color='Keyword',
+    line_shape='linear',
+    markers=True,
+    color_discrete_map=keywords_colors,
+    title='Keyword Counts Across Time Periods'
+)
+fig.update_layout(
+    xaxis_title='Time Period',
+    yaxis_title='Count',
+    legend_title='Keyword',
+    font=dict(size=12),
+    title=dict(font=dict(size=18)),
+    hovermode='x unified',
+    xaxis={'categoryorder':'array', 'categoryarray': period_order}
+)
+st.plotly_chart(fig, use_container_width=True)
